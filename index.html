@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="utf-8">
+　<title>あつ森 株価判定</title> 
+</head>
+<body>
+  <p>株価入力</p>
+  <p id="message">株価を入力してください。日曜と月曜午前のデータから予想します</p>
+  <input type="text" placeholder="日曜午前（買値）" id="SundayMorning"><br>
+  <input type="text" placeholder="月曜午前" id="MondayMorning">
+  <input type="text" placeholder="月曜午後" id="MondayAfternoon">
+  <input type="text" placeholder="火曜午前" id="TuesdayMorning">
+  <input type="text" placeholder="火曜午後" id="TuesdayAfternoon">
+  <input type="text" placeholder="水曜午前" id="WednesdayMorning">
+  <input type="text" placeholder="水曜午後" id="WednesdayAfternoon"><br>
+  <input type="text" placeholder="木曜午前" id="ThursdayMorning">
+  <input type="text" placeholder="木曜午後" id="ThursdayAfternoon">
+  <input type="text" placeholder="金曜午前" id="FridayMorning">
+  <input type="text" placeholder="金曜午後" id="FridayAfternoon">
+  <input type="text" placeholder="土曜午前" id="SaturdayMorning">
+  <input type="text" placeholder="土曜午後" id="SaturdayAfternoon">
+  <canvas id="myLineChart"></canvas>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+  <script>
+  const chartDraw = () => {
+    const ctx = document.getElementById("myLineChart");
+    const stockPrice = [];
+    document.querySelectorAll('input').forEach((e)=>
+      {
+        if(e.value) {stockPrice.push(e.value)}
+        else { stockPrice.push(null) } 
+      }
+    )
+    const sunday = new Array(13).fill(stockPrice[0]);
+    const myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['日曜午前', '月曜午前', '月曜午後', '火曜午前', '火曜午後', '水曜午前',
+                 '水曜午後', '木曜午前', '木曜午後', '金曜午前', '金曜午後', '土曜午前', '土曜午後'],
+        datasets: [
+          {
+            label: '株価',
+            data: stockPrice,
+            borderColor: "rgba(255,0,0,1)",
+            backgroundColor: "rgba(0,0,0,0)"
+          },
+          {
+            label: '買値',
+            data : sunday,
+            borderColor: "rgba(0,0,255,1)",
+            backgroundColor: "rgba(0,0,0,0)"
+          }
+        ],
+      },
+      options: {
+        title: {
+          display: true,
+          text: '株価'
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              suggestedMax: 174,
+              suggestedMin: 0,
+              stepSize: 6,
+              callback: (value, index, values) => value +  'ベル'
+            }
+          }]
+        },
+      }
+    });
+  }
+  const message = (text) => { document.getElementById("message").innerText = text }
+  const check = () =>
+  {
+    message("株価を入力してください。日曜と月曜午前のデータから予想します");
+    const data = document.querySelectorAll('input');
+    if(isNaN(data[0].value) || isNaN(data[1].value) || !data[0].value || !data[1].value)
+    {
+      return;
+    }
+    const value = data[1].value / data[0].value
+    if(value<0.6)
+    {
+      message("４期型かもしれません")
+    }
+    else if(value<0.8)
+    {
+      message("波型か４期型かもしれません")    
+    }
+    else if(value<0.85)
+    {
+      message("３期型か４期型かもしれません")
+    }
+    else if(value<0.91)
+    {
+      message("ジリ貧型か３期型か４期型かもしれません")
+    }
+    else if(value>=0.91)
+    {
+      message("波型か４期型かもしれません")
+    }
+  }
+  (() => {
+    document.querySelectorAll('input').forEach((e)=>e.addEventListener('input', chartDraw))
+    document.querySelectorAll('input').forEach((e)=>e.addEventListener('input', check))
+    chartDraw()
+  })();
+  </script>
+</body>
+</html>
